@@ -103,4 +103,5 @@ class TestProductModel(unittest.TestCase):
 
     #
     # ADD YOUR TEST CASES HERE
-#def someFucntion()
+    def test_update_a_product(self):
+        '''  '''
