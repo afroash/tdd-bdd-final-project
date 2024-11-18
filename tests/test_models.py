@@ -179,3 +179,81 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.category, category)
+
+    def test_deserialize_with_missing_data(self):
+        """It should not deserialize a Product with missing data"""
+        data = {"name": "shirt"}
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_with_invalid_data(self):
+        """It should not deserialize a Product with invalid data"""
+        data = {
+            "name": "shirt",
+            "description": "cotton shirt",
+            "price": "10.00",
+            "available": "true",  # should be boolean
+            "category": "CLOTHS"
+        }
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+    
+    def test_deserialize_with_invalid_attribute(self):
+        """It should not deserialize a Product with invalid attribute"""
+        data = {
+            "name": "shirt",
+            "description": "cotton shirt",
+            "price": "10.00",
+            "available": True,
+            "category": "INVALID_CATEGORY"  # invalid category
+        }
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+    
+    def test_deserialize_with_invalid_type(self):
+        """It should not deserialize a Product with invalid type"""
+        data = "this is not a dictionary"
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+    
+    def test_find_by_name(self):
+        """It should Find Products by Name"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        name = products[0].name
+        count = len([product for product in products if product.name == name])
+        found = Product.find_by_name(name)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.name, name)
+    
+    def test_find_by_price(self):
+        """It should Find Products by Price"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        price = products[0].price
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
+    
+    def test_find_by_price_string(self):
+        """It should Find Products by Price as string"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        price = str(products[0].price)
+        count = len([product for product in products if product.price == Decimal(price)])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, Decimal(price))
+    
+    def test_update_with_empty_id(self):
+        """It should not Update a Product with empty ID"""
+        product = ProductFactory()
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
