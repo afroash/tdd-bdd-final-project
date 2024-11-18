@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -113,7 +113,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(str(product), "<Product Fedora id=[None]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, None)
-        
+
         # Test serialization
         data = product.serialize()
         self.assertEqual(data["name"], "Fedora")
@@ -122,6 +122,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(data["available"], True)
         self.assertEqual(data["category"], "CLOTHS")
     # ADD YOUR TEST CASES HERE
+
     def test_read_a_product(self):
         """It should Read a Product"""
         product = ProductFactory()
@@ -216,7 +217,7 @@ class TestProductModel(unittest.TestCase):
         }
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
-    
+
     def test_deserialize_with_invalid_attribute(self):
         """It should not deserialize a Product with invalid attribute"""
         data = {
@@ -228,13 +229,13 @@ class TestProductModel(unittest.TestCase):
         }
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
-    
+
     def test_deserialize_with_invalid_type(self):
         """It should not deserialize a Product with invalid type"""
         data = "this is not a dictionary"
         product = Product()
         self.assertRaises(DataValidationError, product.deserialize, data)
-    
+
     def test_find_by_name(self):
         """It should Find Products by Name"""
         products = ProductFactory.create_batch(5)
@@ -246,7 +247,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.name, name)
-    
+
     def test_find_by_price(self):
         """It should Find Products by Price"""
         products = ProductFactory.create_batch(5)
@@ -258,7 +259,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.price, price)
-    
+
     def test_find_by_price_string(self):
         """It should Find Products by Price as string"""
         products = ProductFactory.create_batch(5)
@@ -270,7 +271,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.price, Decimal(price))
-    
+
     def test_update_with_empty_id(self):
         """It should not Update a Product with empty ID"""
         product = ProductFactory()
