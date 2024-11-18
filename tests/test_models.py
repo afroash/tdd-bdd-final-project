@@ -101,7 +101,26 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(new_product.available, product.available)
         self.assertEqual(new_product.category, product.category)
 
-    #
+    def test_create_and_serialize_product(self):
+        """It should Create and Serialize a product"""
+        product = Product(
+            name="Fedora",
+            description="A red hat",
+            price=Decimal("12.50"),
+            available=True,
+            category=Category.CLOTHS
+        )
+        self.assertEqual(str(product), "<Product Fedora id=[None]>")
+        self.assertTrue(product is not None)
+        self.assertEqual(product.id, None)
+        
+        # Test serialization
+        data = product.serialize()
+        self.assertEqual(data["name"], "Fedora")
+        self.assertEqual(data["description"], "A red hat")
+        self.assertEqual(data["price"], "12.50")
+        self.assertEqual(data["available"], True)
+        self.assertEqual(data["category"], "CLOTHS")
     # ADD YOUR TEST CASES HERE
     def test_read_a_product(self):
         """It should Read a Product"""
